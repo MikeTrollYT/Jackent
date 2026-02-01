@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jackent</title>
+  <link rel="icon" href="img/logo.png" type="image/png">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"><img src="img/logo.png"></div>
+      <div>
+        <div class="title">Jackent Web</div>
+        <div class="subtitle">Panel privado</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="btn-icon" id="btnSettings" title="Configuración">
+        ⚙️
+      </button>
+      
+      <div class="status" id="healthPill" title="Estado del backend">
+        <span class="dot"></span>
+        <span id="healthText">Conectando…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="card-head">
+        <h2>Búsqueda</h2>
+        <div class="actions">
+          <button class="btn btn-ghost" id="btnReloadTrackers">Recargar trackers</button>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <input id="q" class="input" placeholder="Buscar…" autocomplete="off" />
+        <button class="btn" id="btnSearch">Buscar</button>
+      </div>
+
+      <div class="row split">
+        <div class="block">
+          <div class="block-head">
+            <h3>Trackers</h3>
+            <div class="mini-actions">
+              <button class="btn btn-ghost btn-sm" id="btnSelectAll">Todos</button>
+              <button class="btn btn-ghost btn-sm" id="btnSelectNone">Ninguno</button>
+            </div>
+          </div>
+          <div class="hint">Selecciona uno o varios trackers y busca.</div>
+          <div id="trackers" class="trackers"></div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">
+            <h3>Filtros</h3>
+          </div>
+
+          <div class="filters">
+            <label class="field">
+              <span>Orden</span>
+              <select id="sort" class="select">
+                <option value="relevance">Relevancia</option>
+                <option value="seeders">Seeders</option>
+                <option value="size">Tamaño</option>
+                <option value="date">Fecha</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Máx. resultados</span>
+              <input id="limit" class="input" type="number" min="1" max="200" value="50" />
+            </label>
+
+            <label class="field">
+              <span>Solo con seeders</span>
+              <select id="onlySeeded" class="select">
+                <option value="no">No</option>
+                <option value="yes">Sí</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+	
+	<div id="results-loading" class="loading hidden">
+  		<div class="spinner"></div>
+  		<span>Buscando en trackers...</span>
+	</div>
+
+	
+    <section class="card">
+      <div class="card-head">
+        <h2>Resultados</h2>
+        <div class="actions">
+          <button class="btn btn-ghost" id="btnClearResults">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th class="col-small">Tamaño</th>
+              <th class="col-small">Seeders</th>
+              <th class="col-small">Tracker</th>
+              <th class="col-actions">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr><td colspan="5" class="empty">Aún no hay resultados.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="hint small">
+        El botón <b>Enviar</b> llama a <code>/api/add</code> con el resultado seleccionado.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Descargas</h2>
+        <div class="stats-wrapper">
+          <div class="stats">
+            <span id="statsTotal">Total: 0</span>
+            <span class="sep">·</span>
+            <span id="statsSize">Espacio: 0 B</span>
+          </div>
+        </div>
+        <div class="actions">
+          <label class="toggle">
+            <input type="checkbox" id="autoRefresh" checked />
+            <span>Auto refrescar</span>
+          </label>
+          <button class="btn btn-ghost" id="btnRefreshDownloads">Refrescar</button>
+        </div>
+      </div>
+
+      <div id="downloads" class="downloads">
+        <div class="empty">Sin elementos todavía.</div>
+      </div>
+
+      <div class="hint small">
+        Esta lista viene de <code>/api/list</code>.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Paneles Externos</h2>
+      </div>
+
+      <div class="panels-grid">
+        <a id="linkJackett" href="http://localhost:9117" target="_blank" class="panel-link">
+          <div class="panel-card">
+            <img src="./img/jackett-banner.png" alt="Jackett" class="panel-logo" />
+          </div>
+        </a>
+
+        <a id="linkQbittorrent" href="http://localhost:8080" target="_blank" class="panel-link">
+          <div class="panel-card">
+            <img src="./img/qbittorrent.png" alt="qBittorrent" class="panel-logo" />
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Configuración -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Configuración</h3>
+        <button class="modal-close" id="closeSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <label class="setting-label">
+            <span>⏱️ Tiempo de seedeo (horas)</span>
+            <small>Tiempo que qBittorrent sembrará cada torrent después de completarse</small>
+          </label>
+          <input type="number" id="seedTimeHours" class="input" min="0" value="24" />
+          <small class="hint">0 = Nunca dejar de seedear | 24 = Seedear por 24 horas</small>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">
+            <span>🗑️ Auto-borrar después de (horas)</span>
+            <small>Borrar automáticamente torrents completados después de X horas</small>
+          </label>
+          <input type="number" id="autoDeleteHours" class="input" min="0" value="0" />
+          <small class="hint">0 = Nunca borrar automáticamente | 24 = Borrar tras 24h completado</small>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" style="display: flex; align-items: center; gap: 12px;">
+            <div style="flex: 1;">
+              <span>💾 Limitar espacio de descargas</span>
+              <small style="display: block; margin-top: 4px;">Gestiona automáticamente el espacio borrando torrents antiguos cuando sea necesario</small>
+            </div>
+            <input type="checkbox" id="spaceLimitEnabled" style="width: auto;" />
+          </label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="number" id="spaceLimitGB" class="input" min="1" value="50" style="flex: 1;" />
+            <span style="white-space: nowrap;">GB</span>
+          </div>
+          <small class="hint" id="spaceUsageHint">Espacio usado: 0 GB / 50 GB</small>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="cancelSettings">Cancelar</button>
+          <button class="btn" id="saveSettings">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <hr class="footer-divider">
+  
+  <footer class="footer">
+    <span>Hecho por MikeTroll</span>
+    <span class="sep">·</span>
+    <span id="buildInfo">2026</span>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
