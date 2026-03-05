@@ -6,7 +6,7 @@
 
 **Panel privado de búsqueda y descarga de torrents**
 
-**Documentación:** https://miketroll.es/Jackent
+**Documentación:** https://miketroll.me/Jackent
 
 Una aplicación web moderna que integra Jackett y qBittorrent para buscar y descargar contenido torrent directamente desde tu navegador.
 
@@ -318,3 +318,4 @@ Si tienes preguntas o sugerencias, no dudes en abrir un issue en GitHub.
 ⭐ Si te gusta el proyecto, ¡dale una estrella en GitHub!
 
 </div>
+
